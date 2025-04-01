@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-
     private final UserRepository userRepository;
 
     public void register(UserRegisterRequest request) {
@@ -20,12 +19,6 @@ public class UserService {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        User newUser = User.builder()
-                .username(request.getUsername())
-                .nickname(request.getNickname())
-                .password(request.getPassword())
-                .build();
-
-        userRepository.save(newUser);
+        userRepository.save(request.toEntity());
     }
 }
