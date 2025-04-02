@@ -196,5 +196,16 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+# Spring Boot 정적 파일 빌드 결과물 무시
+src/main/resources/static/static/js/*
+src/main/resources/static/static/css/*
+src/main/resources/static/static/media/*
+
+# Source Map 파일 제외
+*.map
+
+# LICENSE 파일 제외
+*.LICENSE.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,windows,gradle
 play sound

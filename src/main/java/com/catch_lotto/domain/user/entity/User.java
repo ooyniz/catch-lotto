@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -21,19 +22,27 @@ public class User {
     private String username; // id or email
 
     @Column(nullable = false, length = 255)
-    private String nickname;
+    private String password;
 
     @Column(nullable = false, length = 255)
-    private String password;
+    private String nickname;
+
+    @Column
+    private Date birth;
+
+    @Column
+    private Character gender;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Builder
-    public User(String username, String nickname, String password) {
+    public User(String username, String password, String nickname, Date birth, Character gender) {
         this.username = username;
-        this.nickname = nickname;
         this.password = password;
+        this.nickname = nickname;
+        this.birth = birth;
+        this.gender = gender;
     }
     // todo social login
 }

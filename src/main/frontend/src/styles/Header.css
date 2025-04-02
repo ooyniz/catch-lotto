@@ -24,6 +24,12 @@
     color: #333;
 }
 
+.login-link {
+    color: #333;
+    text-decoration: none; /* 밑줄 추가 */
+    cursor: pointer; /* 마우스 커서를 포인터로 변경 */
+}
+
 .login .signup {
     font-size: 18px;
 }
