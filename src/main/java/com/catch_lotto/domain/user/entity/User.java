@@ -35,12 +35,5 @@ public class User {
         this.nickname = nickname;
         this.password = password;
     }
-
-    public void register(String username, String nickname, String password) {
-        this.username = username;
-        this.nickname = nickname;
-        this.password = password;
-    }
-
     // todo social login
 }
