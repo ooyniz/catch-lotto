@@ -1,0 +1,14 @@
+.main-page {
+    text-align: center;
+}
+
+.content {
+    background-color: #e7d1d1;
+    padding: 300px;
+}
+
+.cards {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
