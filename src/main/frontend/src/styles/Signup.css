@@ -57,6 +57,37 @@ select {
   box-sizing: border-box;
 }
 
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+.input-group input {
+  flex: 1; 
+  height: 40px; 
+}
+
+.check-button {
+  padding: 0 15px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ff6600;
+  cursor: pointer;
+  height: 40px;
+  white-space: nowrap;
+  color: white;
+}
+
+.check-button:disabled {
+  background-color: #ccc; /* 회색으로 변경 */
+  color: #666; /* 글씨색 어둡게 */
+  cursor: not-allowed;
+  border: 1px solid #bbb;
+  opacity: 0.6;
+}
+
 /* 성별 선택 그룹 */
 .gender-group {
   display: flex;
@@ -132,4 +163,15 @@ select {
 
 .signup-footer a:hover {
   text-decoration: underline;
+}
+
+.id-check-button {
+  background-color: #ff5000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }

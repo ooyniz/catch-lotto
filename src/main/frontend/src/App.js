@@ -18,7 +18,7 @@ function App() {
         <LoginModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
         <Routes>
           <Route path="/" element={<MainPage />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route path="/signup"  element={<Signup setModalOpen={setModalOpen} />} />
         </Routes>
       </div>
     </Router>

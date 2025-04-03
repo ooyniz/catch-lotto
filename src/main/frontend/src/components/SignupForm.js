@@ -1,19 +1,29 @@
 import React from 'react';
 
-function SignupForm({ formData, handleChange, handleSubmit, passwordMatch, maxBirthDate }) {
+function SignupForm({ formData, handleChange, handleSubmit, passwordMatch, maxBirthDate, handleUsernameCheck, isChecked }) {
     return (
         <form onSubmit={handleSubmit} className="signup-form">
             <h2>회원정보 입력</h2>
             <div className="form-group">
                 <label>아이디</label>
-                <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder="아이디를 입력해 주세요"
-                    required
-                />
+                <div className="input-group">
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        placeholder="아이디를 입력해 주세요"
+                        required
+                    />
+                    <button
+                        type="button"
+                        onClick={handleUsernameCheck}
+                        className="check-button"
+                        disabled={isChecked} // 중복 검사
+                    >
+                        {isChecked ? "사용 가능" : "중복 검사"}
+                    </button>
+                </div>
             </div>
             <div className="form-group">
                 <label>비밀번호</label>
@@ -61,7 +71,7 @@ function SignupForm({ formData, handleChange, handleSubmit, passwordMatch, maxBi
                 />
             </div>
             <div className="form-group gender-group">
-                <label className="gender-label">성별 (선택)</label>
+                <label>성별 (선택)</label>
                 <div className="gender-options">
                     <label className={`gender-option ${formData.gender === 'm' ? 'selected' : ''}`}>
                         <input
