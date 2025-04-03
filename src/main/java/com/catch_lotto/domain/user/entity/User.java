@@ -1,19 +1,19 @@
 package com.catch_lotto.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@Table(name="user")
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 기본 생성자 보호
+@Table(name="users")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
@@ -34,15 +34,20 @@ public class User {
     private Character gender;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDate createdAt = LocalDate.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
     @Builder
-    public User(String username, String password, String nickname, Date birth, Character gender) {
+    public User(String username, String password, String nickname, Date birth, Character gender, Role role) {
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.birth = birth;
         this.gender = gender;
+        this.role = (role != null) ? role : Role.USER;
     }
     // todo social login
 }
