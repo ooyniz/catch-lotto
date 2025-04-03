@@ -1,13 +1,13 @@
-package com.catch_lotto.global.security.jwt;
+package com.catch_lotto.global.security.jwt.filter;
 
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
+import com.catch_lotto.global.security.jwt.JWTUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

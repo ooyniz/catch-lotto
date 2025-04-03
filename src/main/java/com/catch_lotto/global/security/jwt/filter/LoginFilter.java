@@ -1,8 +1,9 @@
-package com.catch_lotto.global.security.jwt;
+package com.catch_lotto.global.security.jwt.filter;
 
 
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.dto.UserLoginRequest;
+import com.catch_lotto.global.security.jwt.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
@@ -61,7 +62,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String access = jwtUtil.createJWT("access", username, role);
         String refresh = jwtUtil.createJWT("refresh", username, role);
-        response.setHeader("access", access);
+        response.setHeader("Authorization", "Bearer " + access);
         response.addCookie(createCookie(refresh));
         response.setStatus(HttpStatus.OK.value());
     }

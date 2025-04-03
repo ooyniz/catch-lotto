@@ -1,9 +1,8 @@
 package com.catch_lotto.global.config;
 
-import com.catch_lotto.global.security.jwt.JWTFilter;
+import com.catch_lotto.global.security.jwt.filter.JWTFilter;
 import com.catch_lotto.global.security.jwt.JWTUtil;
-import com.catch_lotto.global.security.jwt.LoginFilter;
-import jakarta.servlet.Filter;
+import com.catch_lotto.global.security.jwt.filter.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,6 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/login", "/api/user/signup").permitAll() // 회원가입, 로그인 API는 허용
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 API 보호
+                        .requestMatchers("/reissue").permitAll() // token reissue
                         .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
                 )
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
