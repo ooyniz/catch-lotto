@@ -1,19 +1,4 @@
-package com.catch_lotto.global.security;
-
-import com.catch_lotto.domain.user.entity.Role;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.stereotype.Service;
-
-import java.security.Key;
-import java.util.Date;
-
-import static java.util.Base64.getDecoder;
+package com.catch_lotto.global.security.jwt;
 
 //@Service
 //public class JwtTokenProvider {

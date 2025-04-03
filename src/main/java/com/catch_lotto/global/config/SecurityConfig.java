@@ -1,7 +1,9 @@
 package com.catch_lotto.global.config;
 
-import com.catch_lotto.global.security.LoginFilter;
-import lombok.RequiredArgsConstructor;
+import com.catch_lotto.global.security.jwt.JWTFilter;
+import com.catch_lotto.global.security.jwt.JWTUtil;
+import com.catch_lotto.global.security.jwt.LoginFilter;
+import jakarta.servlet.Filter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,12 +24,14 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-//    private final JwtTokenFilter jwtTokenFilter;
-
+    private final JWTFilter jwtFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    public SecurityConfig(JWTFilter jwtFilter, AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+        this.jwtFilter = jwtFilter;
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
     }
 
     @Bean
@@ -52,8 +56,8 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 API 보호
                         .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
                 )
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class) // JWT 필터 적용
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(jwtFilter, LoginFilter.class) // JWT 필터 적용
                 .build();
     }
 

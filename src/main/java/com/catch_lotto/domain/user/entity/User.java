@@ -1,10 +1,7 @@
 package com.catch_lotto.domain.user.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -49,5 +46,6 @@ public class User {
         this.gender = gender;
         this.role = (role != null) ? role : Role.USER;
     }
+
     // todo social login
 }

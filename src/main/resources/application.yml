@@ -15,4 +15,5 @@ spring:
     password: ${DB_PASSWORD}
 jwt:
   secret: ${JWT}
-  expiration: 3600000
+  access: 3600000
+  refresh: 604800000
