@@ -7,6 +7,7 @@ import com.catch_lotto.global.security.jwt.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -31,37 +31,19 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = request.getHeader("access");
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
+        String accessToken = jwtUtil.resolveAccessToken(request);
 
-        // 토큰이 없다면 다음 필터로 넘김
+        // accessToken 없이 접근할 경우
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        try {
-            jwtUtil.isExpired(accessToken);
-        } catch (Exception e) {
-            PrintWriter writer = response.getWriter();
-            writer.print("access token expired");
+        // 유효성 검사
+        jwtUtil.validateToken(accessToken);
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        String category = jwtUtil.getCategory(accessToken);
-
-        if (!category.equals("access")) {
-            PrintWriter writer = response.getWriter();
-            writer.print("Invalid access token");
-
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-
-        String username = jwtUtil.getUsername(accessToken);
-        String role = jwtUtil.getRole(accessToken); // todo : role이 사용되지 않음. 조치 취하기
+        String username = jwtUtil.getSubject(accessToken);
 
         User user = userRepository.findByUsername(username).orElseThrow();
         CustomUserDetails customUserDetails = new CustomUserDetails(user);

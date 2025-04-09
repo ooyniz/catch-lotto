@@ -1,5 +1,6 @@
 package com.catch_lotto.global.security.jwt.service;
 
+import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.global.security.jwt.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;

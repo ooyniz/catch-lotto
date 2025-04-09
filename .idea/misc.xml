@@ -12,6 +12,7 @@
     <writeAnnotations>
       <writeAnnotation name="jakarta.persistence.Column" />
       <writeAnnotation name="jakarta.persistence.GeneratedValue" />
+      <writeAnnotation name="org.springframework.beans.factory.annotation.Value" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
