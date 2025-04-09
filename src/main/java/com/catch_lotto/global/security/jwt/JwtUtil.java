@@ -12,14 +12,14 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
     private final Long accessTokenExpirationMs;
     private final Long refreshTokenExpirationMs;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret,
+    public JwtUtil(@Value("${jwt.secret}") String secretKey,
                    @Value("${jwt.access}") Long accessTokenExpirationMs,
                    @Value("${jwt.refresh}") Long refreshTokenExpirationMs) {
-        this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+        this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.accessTokenExpirationMs = accessTokenExpirationMs;
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
