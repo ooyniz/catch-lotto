@@ -23,6 +23,8 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    private final String[] allowedUrls = {"/", "/reissue", "/login", "/api/user/signup"};
+
     private final JWTFilter jwtFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
@@ -51,9 +53,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // HTTP Basic 인증 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/api/user/signup").permitAll() // 회원가입, 로그인 API는 허용
+                        .requestMatchers(allowedUrls).permitAll() // 회원가입, 로그인 API는 허용
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 전용 API 보호
-                        .requestMatchers("/reissue").permitAll() // token reissue
                         .anyRequest().authenticated() // 나머지 모든 요청은 인증 필요
                 )
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
