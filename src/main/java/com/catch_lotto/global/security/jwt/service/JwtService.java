@@ -1,6 +1,6 @@
 package com.catch_lotto.global.security.jwt.service;
 
-import com.catch_lotto.global.security.jwt.JWTUtil;
+import com.catch_lotto.global.security.jwt.JwtUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class JWTService {
+public class JwtService {
 
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    public JWTService(JWTUtil jwtUtil) {
+    public JwtService(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
 

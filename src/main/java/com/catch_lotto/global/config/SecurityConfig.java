@@ -1,7 +1,7 @@
 package com.catch_lotto.global.config;
 
-import com.catch_lotto.global.security.jwt.filter.JWTFilter;
-import com.catch_lotto.global.security.jwt.JWTUtil;
+import com.catch_lotto.global.security.jwt.filter.JwtFilter;
+import com.catch_lotto.global.security.jwt.JwtUtil;
 import com.catch_lotto.global.security.jwt.filter.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +25,11 @@ import java.util.List;
 public class SecurityConfig {
     private final String[] allowedUrls = {"/", "/reissue", "/login", "/api/user/signup"};
 
-    private final JWTFilter jwtFilter;
+    private final JwtFilter jwtFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    public SecurityConfig(JWTFilter jwtFilter, AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
+    public SecurityConfig(JwtFilter jwtFilter, AuthenticationConfiguration authenticationConfiguration, JwtUtil jwtUtil) {
         this.jwtFilter = jwtFilter;
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;

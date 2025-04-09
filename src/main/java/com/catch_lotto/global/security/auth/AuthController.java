@@ -1,6 +1,6 @@
-package com.catch_lotto.global.security.jwt.controller;
+package com.catch_lotto.global.security.auth;
 
-import com.catch_lotto.global.security.jwt.service.JWTService;
+import com.catch_lotto.global.security.jwt.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -8,11 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class JWTController {
+public class AuthController {
+    private final JwtService jwtService;
 
-    private final JWTService jwtService;
-
-    public JWTController(JWTService jwtService) {
+    public AuthController(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 

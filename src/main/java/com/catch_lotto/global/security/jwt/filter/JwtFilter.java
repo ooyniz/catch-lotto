@@ -3,7 +3,7 @@ package com.catch_lotto.global.security.jwt.filter;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
-import com.catch_lotto.global.security.jwt.JWTUtil;
+import com.catch_lotto.global.security.jwt.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,14 +18,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Component
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
-    private final JWTUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     private final UserRepository userRepository;
 
     @Autowired
-    public JWTFilter(JWTUtil jwtUtil, UserRepository userRepository) {
+    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository) {
         this.jwtUtil = jwtUtil;
         this.userRepository = userRepository;
     }
