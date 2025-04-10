@@ -1,7 +1,10 @@
 package com.catch_lotto.global.security.jwt.filter;
 
-import com.catch_lotto.global.security.jwt.JwtUtil;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
+import com.catch_lotto.global.response.ApiResponse;
 import com.catch_lotto.global.util.RedisUtil;
+import com.catch_lotto.global.response.ResponseCode;
+import com.catch_lotto.global.response.ResponseUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,29 +34,36 @@ public class CustomLogoutFilter extends GenericFilter {
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         String requestUri = request.getRequestURI();
-        String requestMethod = request.getMethod();
         if (!requestUri.equals("/logout")) {
             filterChain.doFilter(request, response);
             return;
         }
-
+        String requestMethod = request.getMethod();
         if (!requestMethod.equals("POST")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String accessToken = extractAccessToken(request);
-        if (accessToken != null && jwtUtil.validateAccessToken(accessToken)) {
-            long remainTime = jwtUtil.getAccessTokenRemainingTime(accessToken);
-            redisUtil.save(accessToken, "logout", remainTime, TimeUnit.MILLISECONDS);
-            redisUtil.delete(jwtUtil.getSubject(accessToken));
+        if ((accessToken == null) || !jwtUtil.validateAccessToken(accessToken)) {
+            ApiResponse<?> apiResponse = ApiResponse.error(ResponseCode.INVALID_TOKEN);
+            ResponseUtil.writeJson(response, apiResponse);
+            return;
         }
 
-        deleteRefreshTokenCookie(response);
+        if ("logout".equals(redisUtil.get(accessToken))) {
+            ApiResponse<?> apiResponse = ApiResponse.error(ResponseCode.ALREADY_LOGOUT);
+            ResponseUtil.writeJson(response, apiResponse);
+            return;
+        }
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.setContentType("application/json");
-        response.getWriter().write("{\"message\": \"로그아웃 성공\"}");
+        long remainTime = jwtUtil.getAccessTokenRemainingTime(accessToken);
+        redisUtil.save(accessToken, "logout", remainTime, TimeUnit.MILLISECONDS);
+        redisUtil.delete(jwtUtil.getSubject(accessToken));
+
+        deleteRefreshTokenCookie(response);
+        ApiResponse<?> apiResponse = ApiResponse.success(ResponseCode.SUCCESS_LOGOUT);
+        ResponseUtil.writeJson(response, apiResponse);
     }
 
     private String extractAccessToken(HttpServletRequest request) {

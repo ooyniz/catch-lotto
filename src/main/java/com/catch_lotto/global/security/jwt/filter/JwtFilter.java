@@ -3,7 +3,7 @@ package com.catch_lotto.global.security.jwt.filter;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
-import com.catch_lotto.global.security.jwt.JwtUtil;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // 유효성 검사
-        jwtUtil.validateToken(accessToken);
+        jwtUtil.validateTokenOrThrow(accessToken);
 
         String username = jwtUtil.getSubject(accessToken);
 

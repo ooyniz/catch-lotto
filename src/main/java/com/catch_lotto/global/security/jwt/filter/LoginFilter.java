@@ -2,14 +2,18 @@ package com.catch_lotto.global.security.jwt.filter;
 
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.dto.UserLoginRequest;
-import com.catch_lotto.global.security.jwt.JwtUtil;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
+import com.catch_lotto.global.response.ApiResponse;
+import com.catch_lotto.global.response.ResponseCode;
+import com.catch_lotto.global.response.ResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -36,13 +40,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             loginRequest = objectMapper.readValue(request.getInputStream(), UserLoginRequest.class);
         } catch (IOException e) {
-            throw new RuntimeException("Invalid login request", e);
+            throw new CustomException(ResponseCode.BAD_REQUEST);
         }
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-        return authenticationManager.authenticate(authenticationToken);
+        try {
+            return authenticationManager.authenticate(authenticationToken);
+        } catch (BadCredentialsException ex) {
+            throw new CustomException(ResponseCode.INVALID_CREDENTIALS);
+        }
     }
 
     @Override
@@ -52,23 +60,15 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access = jwtUtil.createJwtAccessToken(customUserDetails);
         String refresh = jwtUtil.createJwtRefreshToken(customUserDetails);
         response.setHeader("Authorization", "Bearer " + access);
-        response.addCookie(createCookie(refresh));
-        response.setStatus(HttpStatus.OK.value());
+        response.addCookie(jwtUtil.createCookie(refresh));
+
+        ApiResponse<?> apiResponse = ApiResponse.success(ResponseCode.SUCCESS_LOGIN);
+        ResponseUtil.writeJson(response, apiResponse);
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException {
-        response.setStatus(401);
-    }
-
-    private Cookie createCookie(String value) {
-        Cookie cookie = new Cookie("refreshToken", value);
-        cookie.setMaxAge(24*60*60);
-        // https 설정 시
-//        cookie.setSecure(true);
-//        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
+        ApiResponse<?> apiResponse = ApiResponse.error(ResponseCode.LOGIN_FAIL);
+        ResponseUtil.writeJson(response, apiResponse);
     }
 }

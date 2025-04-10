@@ -2,7 +2,7 @@ package com.catch_lotto.global.config;
 
 import com.catch_lotto.global.security.jwt.filter.CustomLogoutFilter;
 import com.catch_lotto.global.security.jwt.filter.JwtFilter;
-import com.catch_lotto.global.security.jwt.JwtUtil;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
 import com.catch_lotto.global.security.jwt.filter.LoginFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +25,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private final String[] allowedUrls = {"/", "/reissue", "/login", "/api/user/signup"};
+    private final String[] allowedUrls = {"/", "/reissue", "/login", "/api/user/signup", "/api/user/exists"};
 
     private final JwtFilter jwtFilter;
     private final AuthenticationConfiguration authenticationConfiguration;

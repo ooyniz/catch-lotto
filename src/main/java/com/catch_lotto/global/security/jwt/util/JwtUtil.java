@@ -1,13 +1,13 @@
-package com.catch_lotto.global.security.jwt;
+package com.catch_lotto.global.security.jwt.util;
 
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.response.ResponseCode;
 import com.catch_lotto.global.util.RedisUtil;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,16 +38,8 @@ public class JwtUtil {
         this.redisUtil = redisUtil;
     }
 
-    public String getUsername(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("username", String.class);
-    }
-
     public String getRole(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
-    }
-
-    public String getCategory(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
     public String getSubject(String token) {
@@ -62,20 +53,6 @@ public class JwtUtil {
 
     public Boolean isExpired(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
-    }
-
-    public String createJWT(String category, String username, String role) {
-        Long expiredMs = category.equals("access") ? accessTokenExpirationMs : refreshTokenExpirationMs;
-
-        return Jwts.builder()
-                .subject(username)
-                .claim("category", category)
-                .claim("username", username)
-                .claim("role", role)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
-                .signWith(secretKey)
-                .compact();
     }
 
     // Token 발급
@@ -118,13 +95,12 @@ public class JwtUtil {
     }
 
     public boolean validateRefreshToken(String refreshToken) {
-
         // 토큰에서 사용자 ID 추출
         String username = getSubject(refreshToken);
 
         // Redis에서 해당 사용자의 refreshToken 조회
         if (!redisUtil.hasKey(username)) {
-            return false; // todo: throw
+            throw new CustomException(ResponseCode.INVALID_TOKEN);
         }
 
         return true;
@@ -134,41 +110,41 @@ public class JwtUtil {
     public String resolveAccessToken(HttpServletRequest request) {
         String authorization = request.getHeader("Authorization");
 
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
-            log.warn("[*] No Token in req");
+        if (authorization == null || authorization.isBlank()) {
+            log.warn("[*] Authorization header is missing");
             return null;
         }
-        log.info("[*] Token exists");
 
-        return authorization.split(" ")[1];
+        if (!authorization.startsWith("Bearer ")) {
+            log.warn("[*] Authorization header does not start with 'Bearer '");
+            return null;
+        }
+
+        String[] parts = authorization.split(" ");
+        if (parts.length != 2 || parts[1].isBlank()) {
+            log.warn("[*] Malformed Authorization header");
+            return null;
+        }
+
+        log.info("[*] Token extracted successfully");
+        return parts[1];
     }
 
-    public void validateToken(String token) {
+    public void validateTokenOrThrow(String token) {
         try {
-            // 구문 분석 시스템의 시계가 JWT를 생성한 시스템의 시계 오차 고려
-            // 약 3분 허용.
-            long seconds = 3 *60;
-            boolean isExpired = Jwts
-                    .parser()
-                    .clockSkewSeconds(seconds)
+            Jwts.parser()
+                    .clockSkewSeconds(180)
                     .verifyWith(secretKey)
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration()
-                    .before(new Date());
-            log.info("[*] Authorization with Token");
-            if (isExpired) {
-                log.info("만료된 JWT 토큰입니다.");
-            }
+                    .parseSignedClaims(token);
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+            throw new CustomException(ResponseCode.INVALID_TOKEN);
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            throw new CustomException(ResponseCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            throw new CustomException(ResponseCode.UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+            throw new CustomException(ResponseCode.BAD_REQUEST);
         }
     }
 
@@ -193,5 +169,17 @@ public class JwtUtil {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    // 쿠키
+    public Cookie createCookie(String value) {
+        Cookie cookie = new Cookie("refreshToken", value);
+        cookie.setMaxAge(24*60*60);
+        // https 설정 시
+//        cookie.setSecure(true);
+//        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }

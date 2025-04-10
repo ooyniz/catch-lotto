@@ -16,11 +16,4 @@ public class UserLoginRequest {
 
     @NotBlank
     private String password;
-
-    public User toEntity() {
-        return User.builder()
-                .username(this.username)
-                .password(this.password)
-                .build();
-    }
 }

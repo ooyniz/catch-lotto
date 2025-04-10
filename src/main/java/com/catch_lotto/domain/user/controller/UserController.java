@@ -1,16 +1,13 @@
 package com.catch_lotto.domain.user.controller;
 
-import com.catch_lotto.domain.user.dto.UserLoginRequest;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
-import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.service.UserService;
-//import com.catch_lotto.global.security.JwtTokenProvider;
+import com.catch_lotto.global.response.ApiResponse;
+import com.catch_lotto.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,15 +16,20 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserSignupRequest request) {
-        User user = userService.signup(request);
-        return new ResponseEntity<>(user.getUserId(), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse<?>> signup(@RequestBody UserSignupRequest request) {
+        userService.signup(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(ResponseCode.SUCCESS_SIGNUP));
     }
 
-    @GetMapping("/check-username")
-    public ResponseEntity<Map<String, Object>> checkUsername(@RequestParam String username) {
-        Map<String, Object> response = userService.checkUsername(username);
-        return ResponseEntity.ok(response);
+    @GetMapping("/exists")
+    public ResponseEntity<ApiResponse<?>> checkUsername(@RequestParam String username) {
+        boolean exists = userService.checkUsername(username);
+
+        ResponseCode code = exists ? ResponseCode.DUPLICATE_USERNAME : ResponseCode.AVAILABLE_USERNAME;
+        return ResponseEntity.status(code.getStatus())
+                .body(ApiResponse.success(code, exists));
     }
 
 }
