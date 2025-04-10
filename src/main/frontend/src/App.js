@@ -1,32 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import MainPage from './pages/MainPage';
-import Login from './pages/Login';
 import Signup from './pages/Signup';
-// import './styles/App.css';
-import {useEffect, useState} from "react";
-import axios from "axios";
+import LoginModal from "./components/LoginModal";
+import Header from "./components/Header"; // Header 컴포넌트 추가
+import "./styles/LoginModal.css";
 
 function App() {
-  const [hello, setHello] = useState('');
-  const [error, setError] = useState('');
-  useEffect(() => {
-    axios.get('http://localhost:8080/api/test')
-        .then((res) => {
-          setHello(res.data);
-        })
-        .catch((err) => {
-          setError(err.message);
-        });
-  }, []);
+  const [isModalOpen, setModalOpen] = useState(false); // 모달 상태 관리
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<MainPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
+      <div>
+        {/* Header에 setModalOpen 전달 */}
+        <Header setModalOpen={setModalOpen} />
+        {/* 모달은 Routes 외부에 배치 */}
+        <LoginModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/signup"  element={<Signup setModalOpen={setModalOpen} />} />
+        </Routes>
+      </div>
     </Router>
   );
 }

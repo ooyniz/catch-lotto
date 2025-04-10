@@ -3,7 +3,7 @@ spring:
     name: catch-lotto
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -13,3 +13,10 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  redis:
+    host: localhost
+    port: 6379
+jwt:
+  secret: ${JWT}
+  access: 3600000
+  refresh: 604800000

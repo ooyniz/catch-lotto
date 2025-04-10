@@ -9,13 +9,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @Data
 @NoArgsConstructor
-public class UserRegisterRequest {
+public class UserLoginRequest {
 
     @NotBlank
     private String username;
-
-    @NotBlank
-    private String nickname;
 
     @NotBlank
     private String password;
@@ -23,7 +20,6 @@ public class UserRegisterRequest {
     public User toEntity() {
         return User.builder()
                 .username(this.username)
-                .nickname(this.nickname)
                 .password(this.password)
                 .build();
     }

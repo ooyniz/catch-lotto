@@ -5,7 +5,6 @@ import '../styles/MainPage.css';
 function MainPage() {
     return (
         <div className="main-page">
-            <Header />
             <main className="content">
             </main>
         </div>

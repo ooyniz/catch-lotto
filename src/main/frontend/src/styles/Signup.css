@@ -1,20 +1,177 @@
+/* 전체 컨테이너 */
 .signup-container {
-    max-width: 400px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f8f9fa;
 }
 
-.signup-container input {
-    width: 100%;
-    margin-bottom: 10px;
-    padding: 8px;
+/* 폼 컨텐츠 */
+.signup-content {
+  width: 400px;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
-.signup-container button {
-    width: 100%;
-    padding: 10px;
-    background-color: black;
-    color: white;
-    border: none;
+/* 폼 그룹 */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+/* 레이블 */
+.form-group label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #333;
+  text-align: left;
+}
+
+.error-input {
+  border: 7px solid red;
+}
+
+.error-text {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+/* 인풋 필드 */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+select {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+.input-group input {
+  flex: 1; 
+  height: 40px; 
+}
+
+.check-button {
+  padding: 0 15px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #ff6600;
+  cursor: pointer;
+  height: 40px;
+  white-space: nowrap;
+  color: white;
+}
+
+.check-button:disabled {
+  background-color: #ccc; /* 회색으로 변경 */
+  color: #666; /* 글씨색 어둡게 */
+  cursor: not-allowed;
+  border: 1px solid #bbb;
+  opacity: 0.6;
+}
+
+/* 성별 선택 그룹 */
+.gender-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+}
+
+.gender-options {
+  display: flex;
+  width: 100%; /* 부모 컨테이너의 너비를 100%로 설정 */
+  gap: 10px; /* 버튼 간 간격 */
+}
+
+.gender-option {
+  flex: 1; /* 부모의 남은 공간을 균등하게 차지 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  cursor: pointer;
+  font-size: 16px;
+  color: #888;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+/* 선택된 버튼 스타일 */
+.gender-option.selected {
+  background-color: #ff6600; /* 선택된 색상 */
+  color: white;
+  border-color: #ff6600;
+  font-weight: bold;
+}
+
+/* 기본 라디오 버튼 숨기기 */
+.gender-option input {
+  display: none;
+}
+
+/* 제출 버튼 */
+.submit-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #ff5000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #e04500;
+}
+
+/* 푸터 스타일 */
+.signup-footer {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.signup-footer a {
+  color: #ff5000;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-footer a:hover {
+  text-decoration: underline;
+}
+
+.id-check-button {
+  background-color: #ff5000;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
