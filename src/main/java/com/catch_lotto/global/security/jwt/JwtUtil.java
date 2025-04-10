@@ -3,7 +3,9 @@ package com.catch_lotto.global.security.jwt;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.global.util.RedisUtil;
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -120,8 +122,6 @@ public class JwtUtil {
         // 토큰에서 사용자 ID 추출
         String username = getSubject(refreshToken);
 
-        System.out.println(redisUtil.hasKey(username));
-
         // Redis에서 해당 사용자의 refreshToken 조회
         if (!redisUtil.hasKey(username)) {
             return false; // todo: throw
@@ -169,6 +169,29 @@ public class JwtUtil {
             log.info("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
+        }
+    }
+
+    public long getAccessTokenRemainingTime(String token) {
+        Date expiration = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+
+        return expiration.getTime() - System.currentTimeMillis();
+    }
+
+    public boolean validateAccessToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(secretKey) // jjwt 0.12.3 기준
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
         }
     }
 }

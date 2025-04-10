@@ -7,18 +7,23 @@ import com.catch_lotto.global.security.jwt.TokenResponse;
 import com.catch_lotto.global.util.RedisUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthService {
 
     private final JwtUtil jwtUtil;
+    private final RedisUtil redisUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
-    public AuthService(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
+    public AuthService(JwtUtil jwtUtil, RedisUtil redisUtil, CustomUserDetailsService customUserDetailsService) {
         this.jwtUtil = jwtUtil;
+        this.redisUtil = redisUtil;
         this.customUserDetailsService = customUserDetailsService;
     }
 
@@ -53,4 +58,5 @@ public class AuthService {
 
         return cookie;
     }
+
 }

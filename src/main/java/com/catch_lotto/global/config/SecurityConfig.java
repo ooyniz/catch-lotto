@@ -1,5 +1,6 @@
 package com.catch_lotto.global.config;
 
+import com.catch_lotto.global.security.jwt.filter.CustomLogoutFilter;
 import com.catch_lotto.global.security.jwt.filter.JwtFilter;
 import com.catch_lotto.global.security.jwt.JwtUtil;
 import com.catch_lotto.global.security.jwt.filter.LoginFilter;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,11 +30,13 @@ public class SecurityConfig {
     private final JwtFilter jwtFilter;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final CustomLogoutFilter customLogoutFilter;
 
-    public SecurityConfig(JwtFilter jwtFilter, AuthenticationConfiguration authenticationConfiguration, JwtUtil jwtUtil) {
+    public SecurityConfig(JwtFilter jwtFilter, AuthenticationConfiguration authenticationConfiguration, JwtUtil jwtUtil, CustomLogoutFilter customLogoutFilter) {
         this.jwtFilter = jwtFilter;
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
+        this.customLogoutFilter = customLogoutFilter;
     }
 
     @Bean
@@ -59,6 +63,7 @@ public class SecurityConfig {
                 )
                 .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(jwtFilter, LoginFilter.class) // JWT 필터 적용
+                .addFilterBefore(customLogoutFilter, LogoutFilter.class)
                 .build();
     }
 
