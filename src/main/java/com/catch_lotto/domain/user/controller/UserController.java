@@ -1,12 +1,15 @@
 package com.catch_lotto.domain.user.controller;
 
+import com.catch_lotto.domain.user.dto.CustomUserDetails;
+import com.catch_lotto.domain.user.dto.UserInfoResponse;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
 import com.catch_lotto.domain.user.service.UserService;
 import com.catch_lotto.global.response.ApiResponse;
 import com.catch_lotto.global.response.ResponseCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -18,8 +21,9 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<?>> signup(@RequestBody UserSignupRequest request) {
         userService.signup(request);
+
         return ResponseEntity
-                .status(HttpStatus.CREATED)
+                .status(ResponseCode.SUCCESS_SIGNUP.getStatus())
                 .body(ApiResponse.success(ResponseCode.SUCCESS_SIGNUP));
     }
 
@@ -27,9 +31,18 @@ public class UserController {
     public ResponseEntity<ApiResponse<?>> checkUsername(@RequestParam String username) {
         boolean exists = userService.checkUsername(username);
 
-        ResponseCode code = exists ? ResponseCode.DUPLICATE_USERNAME : ResponseCode.AVAILABLE_USERNAME;
-        return ResponseEntity.status(code.getStatus())
-                .body(ApiResponse.success(code, exists));
+        ResponseCode responseCode = exists ? ResponseCode.DUPLICATE_USERNAME : ResponseCode.AVAILABLE_USERNAME;
+        return ResponseEntity.status(responseCode.getStatus())
+                .body(ApiResponse.success(responseCode, exists));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<?>> getMyInfo(@AuthenticationPrincipal CustomUserDetails user) {
+        UserInfoResponse response = userService.getMyInfo(user);
+
+        return ResponseEntity
+                .status(ResponseCode.SUCCESS_SIGNUP.getStatus())
+                .body(ApiResponse.success(ResponseCode.SUCCESS_SIGNUP, response));
     }
 
 }

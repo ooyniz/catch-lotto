@@ -1,12 +1,12 @@
 package com.catch_lotto.global.security.jwt.filter;
 
+import com.catch_lotto.global.security.jwt.util.CookieUtil;
 import com.catch_lotto.global.security.jwt.util.JwtUtil;
 import com.catch_lotto.global.response.ApiResponse;
 import com.catch_lotto.global.util.RedisUtil;
 import com.catch_lotto.global.response.ResponseCode;
 import com.catch_lotto.global.response.ResponseUtil;
 import jakarta.servlet.*;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,12 @@ public class CustomLogoutFilter extends GenericFilter {
 
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
+    private final CookieUtil cookieUtil;
 
-    public CustomLogoutFilter(JwtUtil jwtUtil, RedisUtil redisUtil) {
+    public CustomLogoutFilter(JwtUtil jwtUtil, RedisUtil redisUtil, CookieUtil cookieUtil) {
         this.jwtUtil = jwtUtil;
         this.redisUtil = redisUtil;
+        this.cookieUtil = cookieUtil;
     }
 
     @Override
@@ -44,7 +46,7 @@ public class CustomLogoutFilter extends GenericFilter {
             return;
         }
 
-        String accessToken = extractAccessToken(request);
+        String accessToken = jwtUtil.resolveAccessToken(request);
         if ((accessToken == null) || !jwtUtil.validateAccessToken(accessToken)) {
             ApiResponse<?> apiResponse = ApiResponse.error(ResponseCode.INVALID_TOKEN);
             ResponseUtil.writeJson(response, apiResponse);
@@ -61,24 +63,9 @@ public class CustomLogoutFilter extends GenericFilter {
         redisUtil.save(accessToken, "logout", remainTime, TimeUnit.MILLISECONDS);
         redisUtil.delete(jwtUtil.getSubject(accessToken));
 
-        deleteRefreshTokenCookie(response);
+        cookieUtil.deleteRefreshTokenCookie(response);
         ApiResponse<?> apiResponse = ApiResponse.success(ResponseCode.SUCCESS_LOGOUT);
         ResponseUtil.writeJson(response, apiResponse);
     }
 
-    private String extractAccessToken(HttpServletRequest request) {
-        String bearer = request.getHeader("Authorization");
-        if (bearer != null && bearer.startsWith("Bearer ")) {
-            return bearer.substring(7);
-        }
-        return null;
-    }
-
-    private void deleteRefreshTokenCookie(HttpServletResponse response) {
-        Cookie deleteCookie = new Cookie("refreshToken", null);
-        deleteCookie.setMaxAge(0);
-        deleteCookie.setPath("/");
-        deleteCookie.setHttpOnly(true);
-        response.addCookie(deleteCookie);
-    }
 }

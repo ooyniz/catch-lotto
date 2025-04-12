@@ -1,5 +1,7 @@
 package com.catch_lotto.domain.user.service;
 
+import com.catch_lotto.domain.user.dto.CustomUserDetails;
+import com.catch_lotto.domain.user.dto.UserInfoResponse;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
 import com.catch_lotto.domain.user.entity.Role;
 import com.catch_lotto.domain.user.entity.User;
@@ -39,4 +41,12 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
+    public UserInfoResponse getMyInfo(CustomUserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+
+        return new UserInfoResponse(user.getUsername(), user.getNickname(), user.getBirth(), user.getGender());
+    }
 }
