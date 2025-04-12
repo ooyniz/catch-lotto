@@ -41,8 +41,8 @@ public class UserController {
         UserInfoResponse response = userService.getMyInfo(user);
 
         return ResponseEntity
-                .status(ResponseCode.SUCCESS_SIGNUP.getStatus())
-                .body(ApiResponse.success(ResponseCode.SUCCESS_SIGNUP, response));
+                .status(ResponseCode.SUCCESS_USERINFO.getStatus())
+                .body(ApiResponse.success(ResponseCode.SUCCESS_USERINFO, response));
     }
 
 }
