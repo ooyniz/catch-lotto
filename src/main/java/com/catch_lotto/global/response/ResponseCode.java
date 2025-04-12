@@ -23,6 +23,9 @@ public enum ResponseCode {
     UNSUPPORTED_TOKEN(HttpStatus.BAD_REQUEST, "지원하지 않는 토큰 형식입니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "잘못된 요청입니다."),
     SUCCESS_USERINFO(HttpStatus.OK, "회원 정보를 성공적으로 불러왔습니다."),
+    SUCCESS_UPDATE_USER(HttpStatus.OK, "회원 정보를 성공적으로 수정했습니다."),
+    SUCCESS_DELETE_USER(HttpStatus.OK, "회원 정보를 성공적으로 삭제했습니다."),
+    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
 
     ;
 

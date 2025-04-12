@@ -1,8 +1,27 @@
 import React from 'react';
 import '../styles/Header.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-const Header = ({ isLogin, setModalOpen }) => {
+const Header = ({ isLogin, setModalOpen, setIsLogin }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        const token = localStorage.getItem("accessToken");
+      
+        await fetch("/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+          credentials: "include", 
+        });
+      
+        localStorage.removeItem("accessToken");
+        setIsLogin(false);
+        alert("로그아웃 되었습니다.");
+        navigate("/");
+      };
+
     return (
         <header className="header">
             <Link to='/'>
@@ -10,7 +29,7 @@ const Header = ({ isLogin, setModalOpen }) => {
             </Link>
             <nav className="nav-links">
                 {isLogin ? (
-                        <Link to="/mypage">My Page</Link>
+                        <><Link to="/mypage">My Page</Link><span onClick={handleLogout} className="login-link">Logout</span></>
                     // <Link to="/mypage" className="login-link">My Page</Link>
                 ) : (
                     <>

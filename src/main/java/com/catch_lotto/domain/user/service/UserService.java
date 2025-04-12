@@ -3,9 +3,12 @@ package com.catch_lotto.domain.user.service;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.dto.UserInfoResponse;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
+import com.catch_lotto.domain.user.dto.UserUpdateRequest;
 import com.catch_lotto.domain.user.entity.Role;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.response.ResponseCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,8 +48,26 @@ public class UserService {
         String username = userDetails.getUsername();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
 
         return new UserInfoResponse(user.getUsername(), user.getNickname(), user.getBirth(), user.getGender());
+    }
+
+    public void updateUser(String username, UserUpdateRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+
+        user.setNickname(request.getNickname());
+        user.setBirth(request.getBirth());
+        user.setGender(request.getGender());
+
+        userRepository.save(user);
+    }
+
+    public void deleteUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+
+        userRepository.delete(user);
     }
 }

@@ -3,6 +3,7 @@ package com.catch_lotto.domain.user.controller;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.dto.UserInfoResponse;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
+import com.catch_lotto.domain.user.dto.UserUpdateRequest;
 import com.catch_lotto.domain.user.service.UserService;
 import com.catch_lotto.global.response.ApiResponse;
 import com.catch_lotto.global.response.ResponseCode;
@@ -37,12 +38,31 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ApiResponse<?>> getMyInfo(@AuthenticationPrincipal CustomUserDetails user) {
-        UserInfoResponse response = userService.getMyInfo(user);
+    public ResponseEntity<ApiResponse<?>> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        UserInfoResponse response = userService.getMyInfo(userDetails);
 
         return ResponseEntity
                 .status(ResponseCode.SUCCESS_USERINFO.getStatus())
                 .body(ApiResponse.success(ResponseCode.SUCCESS_USERINFO, response));
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<?>> updateUser(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                 @RequestBody UserUpdateRequest request) {
+        userService.updateUser(userDetails.getUsername(), request);
+
+        return ResponseEntity
+                .status(ResponseCode.SUCCESS_UPDATE_USER.getStatus())
+                .body(ApiResponse.success(ResponseCode.SUCCESS_UPDATE_USER));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ApiResponse<?>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        userService.deleteUser(userDetails.getUsername());
+
+        return ResponseEntity
+                .status(ResponseCode.SUCCESS_DELETE_USER.getStatus())
+                .body(ApiResponse.success(ResponseCode.SUCCESS_DELETE_USER));
     }
 
 }

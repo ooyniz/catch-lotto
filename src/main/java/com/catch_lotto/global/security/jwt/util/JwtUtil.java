@@ -112,7 +112,8 @@ public class JwtUtil {
 
     public boolean validateAccessToken(String token) {
         try {
-            if (redisUtil.hasKey(token)) {
+            // redis에 key 값이 없으면 false
+            if (!redisUtil.hasKey(getSubject(token)) || isExpired(token)) {
                 return false;
             }
             Jwts.parser()
@@ -120,8 +121,6 @@ public class JwtUtil {
                     .verifyWith(secretKey) // jjwt 0.12.3 기준
                     .build()
                     .parseSignedClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
             return true;
         } catch (JwtException | IllegalArgumentException e) {
             return false;

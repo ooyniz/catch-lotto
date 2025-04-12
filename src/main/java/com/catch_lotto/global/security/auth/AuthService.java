@@ -37,9 +37,6 @@ public class AuthService {
             throw new CustomException(ResponseCode.INVALID_TOKEN);
         }
 
-        // JWT 자체가 유효한지 확인 todo
-        jwtUtil.validateTokenOrThrow(refreshToken);
-
         // refresh token이 redis에 존재하는지 확인
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
             throw new CustomException(ResponseCode.INVALID_TOKEN);
@@ -58,8 +55,9 @@ public class AuthService {
         return newAccessToken;
     }
 
+    // 토큰 만료 체크
     public boolean validate(String requestAccessToken) {
         if (requestAccessToken == null) return false;
-        else return jwtUtil.validateAccessToken(requestAccessToken);
+        else return jwtUtil.validateAccessToken(requestAccessToken.substring(7));
     }
 }

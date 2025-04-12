@@ -21,12 +21,15 @@ public class User {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Setter
     @Column(nullable = false, length = 255)
     private String nickname;
 
+    @Setter
     @Column
     private Date birth;
 
+    @Setter
     @Column
     private Character gender;
 

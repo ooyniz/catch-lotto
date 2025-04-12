@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MyPageForm from '../components/MyPageForm';
 
-function MyPage() {
+function MyPage({ setIsLogin }) {
     const [formData, setFormData] = useState({
         username: '',
         nickname: '',
@@ -11,6 +11,32 @@ function MyPage() {
     });
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+          try {
+            const token = localStorage.getItem("accessToken");
+            const res = await fetch("/api/user/me", {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+      
+            const data = await res.json();
+            if (res.ok && data.status === 200) {
+              setFormData(data.data); // ✅ 성공 시 formData에 유저 정보 저장
+            } else {
+              alert("로그인이 만료되었습니다.");
+              navigate("/");
+            }
+          } catch (err) {
+            alert("유저 정보를 불러올 수 없습니다.");
+            navigate("/");
+          }
+        };
+      
+        fetchUserInfo();
+      }, [navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -60,6 +86,7 @@ function MyPage() {
             if (data.status === 200) {
                 alert("회원 탈퇴가 완료되었습니다.");
                 localStorage.removeItem("accessToken");
+                setIsLogin(false);
                 navigate('/');
             } else {
                 alert("탈퇴 실패: " + data.message);
@@ -68,30 +95,6 @@ function MyPage() {
             alert("에러 발생: " + error);
         }
     };
-
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                const token = localStorage.getItem('accessToken');
-                const response = await fetch('/api/user/me', {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
-                if (data.status === 200) {
-                    setFormData(data.data);
-                } else {
-                    alert("로그인 정보가 만료되었습니다.");
-                    navigate('/');
-                }
-            } catch (err) {
-                alert("유저 정보 불러오기 실패");
-            }
-        };
-
-        fetchUserInfo();
-    }, [navigate]);
 
     const today = new Date();
     const maxDate = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate())
