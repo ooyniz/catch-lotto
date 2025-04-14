@@ -30,7 +30,6 @@ const Header = ({ isLogin, setModalOpen, setIsLogin }) => {
             <nav className="nav-links">
                 {isLogin ? (
                         <><Link to="/mypage">My Page</Link><span onClick={handleLogout} className="login-link">Logout</span></>
-                    // <Link to="/mypage" className="login-link">My Page</Link>
                 ) : (
                     <>
                         <span onClick={() => setModalOpen(true)} className="login-link">Login</span> /
