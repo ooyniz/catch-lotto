@@ -16,6 +16,13 @@ spring:
   redis:
     host: localhost
     port: 6379
+  jackson:
+    date-format: yyyy-MM-dd
+    serialization:
+      write-dates-as-timestamps: false
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 jwt:
   secret: ${JWT}
   access: 3600000

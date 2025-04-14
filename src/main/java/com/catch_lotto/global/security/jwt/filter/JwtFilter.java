@@ -3,10 +3,17 @@ package com.catch_lotto.global.security.jwt.filter;
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
-import com.catch_lotto.global.security.jwt.JwtUtil;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.response.ResponseCode;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.InvalidClaimException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -40,9 +48,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 유효성 검사
-        jwtUtil.validateToken(accessToken);
-
         String username = jwtUtil.getSubject(accessToken);
 
         User user = userRepository.findByUsername(username).orElseThrow();
@@ -52,6 +57,5 @@ public class JwtFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);
-
     }
 }

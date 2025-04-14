@@ -1,19 +1,18 @@
 package com.catch_lotto.domain.user.service;
 
-import com.catch_lotto.domain.user.dto.UserLoginRequest;
+import com.catch_lotto.domain.user.dto.CustomUserDetails;
+import com.catch_lotto.domain.user.dto.UserInfoResponse;
 import com.catch_lotto.domain.user.dto.UserSignupRequest;
+import com.catch_lotto.domain.user.dto.UserUpdateRequest;
 import com.catch_lotto.domain.user.entity.Role;
 import com.catch_lotto.domain.user.entity.User;
 import com.catch_lotto.domain.user.repository.UserRepository;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.response.ResponseCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,35 +22,52 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public User signup(UserSignupRequest request) {
+    public void signup(UserSignupRequest request) {
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-//        User user = request.toEntity(bCryptPasswordEncoder);
-//        userRepository.save(user);
         String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 
         User user = User.builder()
                 .username(request.getUsername())
-                .password(encodedPassword) // 🔹 암호화된 비밀번호 저장
+                .password(encodedPassword)
                 .nickname(request.getNickname())
                 .birth(request.getBirth())
                 .gender(request.getGender())
                 .role(Role.USER) // 기본값 USER
                 .build();
                 userRepository.save(user);
-        return user;
     }
 
-    public Map<String, Object> checkUsername(String username) {
-        boolean exists = userRepository.findByUsername(username).isPresent();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("exists", exists);
-        response.put("message", exists ? "이미 사용 중인 아이디입니다." : "사용 가능한 아이디입니다!");
-
-        return response;
+    public boolean checkUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
+    public UserInfoResponse getMyInfo(CustomUserDetails userDetails) {
+        String username = userDetails.getUsername();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+
+        return new UserInfoResponse(user.getUsername(), user.getNickname(), user.getBirth(), user.getGender());
+    }
+
+    public void updateUser(String username, UserUpdateRequest request) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+
+        user.setNickname(request.getNickname());
+        user.setBirth(request.getBirth());
+        user.setGender(request.getGender());
+
+        userRepository.save(user);
+    }
+
+    public void deleteUser(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CustomException(ResponseCode.NOT_FOUND_USER));
+
+        userRepository.delete(user);
+    }
 }

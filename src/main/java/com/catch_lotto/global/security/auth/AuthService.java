@@ -2,55 +2,62 @@ package com.catch_lotto.global.security.auth;
 
 import com.catch_lotto.domain.user.dto.CustomUserDetails;
 import com.catch_lotto.domain.user.service.CustomUserDetailsService;
-import com.catch_lotto.global.security.jwt.JwtUtil;
-import com.catch_lotto.global.security.jwt.TokenResponse;
-import com.catch_lotto.global.util.RedisUtil;
-import jakarta.servlet.http.Cookie;
+import com.catch_lotto.global.exception.CustomException;
+import com.catch_lotto.global.response.ResponseCode;
+import com.catch_lotto.global.security.jwt.util.CookieUtil;
+import com.catch_lotto.global.security.jwt.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class AuthService {
 
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
     private final CustomUserDetailsService customUserDetailsService;
 
-    public AuthService(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
+    public AuthService(JwtUtil jwtUtil, CookieUtil cookieUtil, CustomUserDetailsService customUserDetailsService) {
         this.jwtUtil = jwtUtil;
+        this.cookieUtil = cookieUtil;
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    public TokenResponse reissue(HttpServletResponse response, String refreshToken) {
-        // 1. Refresh Token 검증
+    public String reissue(HttpServletRequest request, HttpServletResponse response, String refreshToken) {
+        // 1. Access, Refresh Token 검증
+        String accessToken = jwtUtil.resolveAccessToken(request);
+        if (accessToken == null || !jwtUtil.validateAccessToken(accessToken)) {
+            throw new CustomException(ResponseCode.INVALID_TOKEN);
+        }
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new CustomException(ResponseCode.INVALID_TOKEN);
+        }
+
+        // refresh token이 redis에 존재하는지 확인
         if (!jwtUtil.validateRefreshToken(refreshToken)) {
-            throw new IllegalArgumentException("Invalid refresh token");
+            throw new CustomException(ResponseCode.INVALID_TOKEN);
         }
 
         // 2. 사용자 ID 추출
         String username = jwtUtil.getSubject(refreshToken);
-
         UserDetails customUserDetails = customUserDetailsService.loadUserByUsername(username);
 
         String newAccessToken = jwtUtil.createJwtAccessToken((CustomUserDetails)customUserDetails);
         String newRefreshToken = jwtUtil.createJwtRefreshToken((CustomUserDetails)customUserDetails);
 
         response.setHeader("Authorization", "Bearer " + newAccessToken);
-        response.addCookie(createCookie(newRefreshToken));
-        response.setStatus(HttpStatus.OK.value());
+        response.addCookie(cookieUtil.createCookie(newRefreshToken));
 
-        return new TokenResponse(newAccessToken, newRefreshToken);
+        return newAccessToken;
     }
 
-    private Cookie createCookie(String value) {
-        Cookie cookie = new Cookie("refreshToken", value);
-        cookie.setMaxAge(24*60*60);
-        // https 설정 시
-//        cookie.setSecure(true);
-//        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        return cookie;
+    // 토큰 만료 체크
+    public boolean validate(String requestAccessToken) {
+        if (requestAccessToken == null) return false;
+        else return jwtUtil.validateAccessToken(requestAccessToken.substring(7));
     }
 }

@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Date;
 
@@ -28,14 +27,4 @@ public class UserSignupRequest {
     private Date birth;
 
     private Character gender;
-
-    public User toEntity() {
-        return User.builder()
-                .username(this.username)
-                .password(this.password)
-                .nickname(this.nickname)
-                .birth(this.birth)
-                .gender(this.gender)
-                .build();
-    }
 }

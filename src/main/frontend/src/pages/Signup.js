@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
 import axios from "axios";
 import '../styles/Signup.css';
@@ -27,7 +27,7 @@ function Signup({ setModalOpen }) {
     
         // 중복 검사 API 호출
         try {
-            const response = await fetch(`/api/user/check-username?username=${formData.username}`);
+            const response = await fetch(`/api/user/exists?username=${formData.username}`);
             const data = await response.json();
     
             alert(data.message);
@@ -102,7 +102,7 @@ function Signup({ setModalOpen }) {
                     />
                 </div>
                 <div className="signup-footer">
-                    <p>이미 계정이 있으신가요? <Link to="/login">로그인</Link></p>
+                    <p>이미 계정이 있으신가요? <button onClick={() => setModalOpen(true)}>로그인</button></p>
                 </div>
             </div>            
         </div>

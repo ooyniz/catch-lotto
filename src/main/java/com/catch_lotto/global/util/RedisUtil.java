@@ -22,6 +22,11 @@ public class RedisUtil {
         redisTemplate.opsForValue().set(key, value, durationMillis);
     }
 
+    public String getData(String key) {
+        Object value = redisTemplate.opsForValue().get(key);
+        return value != null ? value.toString() : null;
+    }
+
     public boolean hasKey(String key) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
