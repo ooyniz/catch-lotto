@@ -1,5 +1,6 @@
 package com.catch_lotto.domain.lotto.controller;
 
+import com.catch_lotto.domain.lotto.dto.LottoResponse;
 import com.catch_lotto.domain.lotto.dto.LottoStat;
 import com.catch_lotto.domain.lotto.service.LottoService;
 import com.catch_lotto.global.response.ApiResponse;
@@ -19,6 +20,15 @@ public class LottoController {
 
     public LottoController(LottoService lottoService) {
         this.lottoService = lottoService;
+    }
+
+    @GetMapping("/random")
+    public ResponseEntity<ApiResponse<LottoResponse>> getRandom() {
+        LottoResponse result = lottoService.getRandom();
+
+        return ResponseEntity
+                .status(ResponseCode.LOTTO_RANDOM_OK.getStatus())
+                .body(ApiResponse.success(ResponseCode.LOTTO_RANDOM_OK, result));
     }
 
     @GetMapping("/stats")

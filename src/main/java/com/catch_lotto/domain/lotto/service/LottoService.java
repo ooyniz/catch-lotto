@@ -1,6 +1,7 @@
 package com.catch_lotto.domain.lotto.service;
 
 import com.catch_lotto.domain.lotto.dto.LottoApiResponse;
+import com.catch_lotto.domain.lotto.dto.LottoResponse;
 import com.catch_lotto.domain.lotto.dto.LottoStat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,28 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LottoService {
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public LottoResponse getRandom() {
+        Random random = new Random();
+        Set<Integer> uniqueNumbers = new HashSet<>();
+
+        while (uniqueNumbers.size() < 6) {
+            uniqueNumbers.add(random.nextInt(45) + 1);
+        }
+
+        List<Integer> sorted = uniqueNumbers.stream()
+                .sorted()
+                .toList();
+
+        return new LottoResponse(
+                sorted.get(0),
+                sorted.get(1),
+                sorted.get(2),
+                sorted.get(3),
+                sorted.get(4),
+                sorted.get(5)
+        );
+    }
 
     public List<LottoStat> getTop6(Integer count) {
         int latestRound = getLatestRound();
