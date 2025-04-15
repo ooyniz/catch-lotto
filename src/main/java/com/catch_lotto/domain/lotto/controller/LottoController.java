@@ -6,10 +6,7 @@ import com.catch_lotto.domain.lotto.service.LottoService;
 import com.catch_lotto.global.response.ApiResponse;
 import com.catch_lotto.global.response.ResponseCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,6 +22,15 @@ public class LottoController {
     @GetMapping("/random")
     public ResponseEntity<ApiResponse<LottoResponse>> getRandom() {
         LottoResponse result = lottoService.getRandom();
+
+        return ResponseEntity
+                .status(ResponseCode.LOTTO_RANDOM_OK.getStatus())
+                .body(ApiResponse.success(ResponseCode.LOTTO_RANDOM_OK, result));
+    }
+
+    @PostMapping("/smart-random")
+    public ResponseEntity<ApiResponse<LottoResponse>> getSmartRandom(@RequestBody List<Integer> selectedNumber) {
+        LottoResponse result = lottoService.getSmartRandom(selectedNumber);
 
         return ResponseEntity
                 .status(ResponseCode.LOTTO_RANDOM_OK.getStatus())

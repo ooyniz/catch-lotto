@@ -6,6 +6,9 @@ function MainPage() {
     const [stats, setStats] = useState([]);
     const [random, setRandom] = useState(null); // 추천 번호
     const [loading, setLoading] = useState(false);
+    const [selectedTopNumber, setSelectedTopNumber] = useState([]);
+    const [randomNumber, setRandomNumber] = useState(null); // 추천 번호
+
 
     // 조회할 회차 수가 바뀔 때마다 API 호출
     useEffect(() => {
@@ -15,6 +18,7 @@ function MainPage() {
                 const res = await fetch(`/api/lotto/stats?count=${count}`);
                 const data = await res.json();
                 setStats(data.data);
+                setSelectedTopNumber([]);
             } catch (err) {
                 console.error('로또 통계 조회 실패:', err);
             } finally {
@@ -24,6 +28,14 @@ function MainPage() {
 
         fetchStats();
     }, [count]);
+
+    const toggleTopRandom = (num) => {
+        setSelectedTopNumber((prev) =>
+            prev.includes(num)
+                ? prev.filter(n => n !== num)
+                : [...prev, num].slice(0, 6) // 최대 6개까지만
+        );
+    };
 
     const fetchRandom = async () => {
         try {
@@ -35,8 +47,19 @@ function MainPage() {
         }
     };
 
+    const fetchTopRandom = async () => {
+        const res = await fetch('/api/lotto/smart-random', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(selectedTopNumber),
+        });
+        const data = await res.json();
+        setRandomNumber(data.data);
+    };
+
     return (
         <div className="main-page">
+            <h1>당신의 행운의 번호는?</h1>
             <main className="content">
                 <h2>🎲 랜덤 추천 번호</h2>
                 <button onClick={fetchRandom} style={{ marginBottom: '20px' }}>
@@ -50,7 +73,22 @@ function MainPage() {
                         ))}
                     </div>
                 )}
-                
+
+
+                <h2>🎲 많이 나온 번호로 추천</h2>
+                <h3>로또 번호 통계에서 마음에 드는 번호를 선택해 주세요.</h3>
+                <button onClick={fetchTopRandom} style={{ marginBottom: '20px' }}>
+                    추천 번호 보기
+                </button>
+
+                {randomNumber && (
+                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+                        {Object.values(randomNumber).map((num, idx) => (
+                            <div key={idx} className="ball">{num}</div>
+                        ))}
+                    </div>
+                )}
+
                 <hr style={{ margin: '40px 0' }} />
                 <h2>🎯 로또 번호 통계</h2>
 
@@ -72,7 +110,16 @@ function MainPage() {
                     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
                         {stats.map(({ number, count }) => (
                             <div key={number} className="ball-container">
-                                <div className="ball">{number}</div>
+                                <div
+                                    className="ball"
+                                    style={{
+                                        borderColor: selectedTopNumber.includes(number) ? '#e91e63' : '#ff6b00',
+                                        cursor: 'pointer',
+                                    }}
+                                    onClick={() => toggleTopRandom(number)}
+                                >
+                                    {number}
+                                </div>
                                 <div>{count}회</div>
                             </div>
                         ))}

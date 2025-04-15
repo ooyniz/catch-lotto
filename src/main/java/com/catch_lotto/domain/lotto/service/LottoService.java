@@ -92,4 +92,23 @@ public class LottoService {
         long days = (now.getTimeInMillis() - base.getTimeInMillis()) / (1000 * 60 * 60 * 24);
         return (int) (days / 7) + 1;
     }
+
+    public LottoResponse getSmartRandom(List<Integer> selectedNumber) {
+        Set<Integer> result = new HashSet<>(selectedNumber);
+        Random random = new Random();
+
+        while (result.size() < 6) {
+            result.add(random.nextInt(45) + 1);
+        }
+
+        List<Integer> sorted = result.stream().sorted().toList();
+        return new LottoResponse(
+                sorted.get(0),
+                sorted.get(1),
+                sorted.get(2),
+                sorted.get(3),
+                sorted.get(4),
+                sorted.get(5)
+        );
+    }
 }
