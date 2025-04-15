@@ -1,5 +1,6 @@
 package com.catch_lotto.global.response;
 
+import com.catch_lotto.domain.lotto.dto.LottoStat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
