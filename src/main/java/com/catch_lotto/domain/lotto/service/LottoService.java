@@ -2,8 +2,6 @@ package com.catch_lotto.domain.lotto.service;
 
 import com.catch_lotto.domain.lotto.dto.LottoApiResponse;
 import com.catch_lotto.domain.lotto.dto.LottoStat;
-import com.catch_lotto.global.exception.CustomException;
-import com.catch_lotto.global.response.ResponseCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
